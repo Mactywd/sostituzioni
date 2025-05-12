@@ -167,7 +167,7 @@ var teachers_timetables = {
 	["5S", "R", "", "4D", "5D", "", "", ""],
 	["", "", "", "", "", "", "", ""],
 ],
-"DI BATTISTA  VALENTINA": [
+"DI BATTISTA VALENTINA": [
 	["1C", "1L", "", "1S", "1D", "", "", ""],
 	["1E", "1L", "1D", "", "1C", "", "", ""],
 	["", "", "1S", "", "1D", "1L", "1E", ""],
@@ -311,7 +311,7 @@ var teachers_timetables = {
 	["1O", "3I", "1O", "1O", "", "", "", ""],
 	["3I", "R", "3I", "", "", "", "", ""],
 ],
-"MACHETTI  ALESSANDRA": [
+"MACHETTI ALESSANDRA": [
 	["", "4I", "3F", "3F", "4I", "", "", ""],
 	["", "", "", "", "", "", "", ""],
 	["4O", "", "4I", "4I", "3F", "", "", ""],
@@ -773,4 +773,4 @@ class Sostituzioni {
 }
 
 let sostituzioni = new Sostituzioni(teachers_timetables)
-console.log(sostituzioni.generate_sostituzioni("SANTORIELLO ANGELA", 3))
+console.log(sostituzioni.generate_sostituzioni(["LAGHI PIER GIORGIO", "MACHETTI ALESSANDRA", "SILVESTRI SILVIA"], 0))

@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Absence Tracker</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --border-radius: 6px;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .main-content {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+        
+        .panel {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--light-color);
+        }
+        
+        .teacher-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .search-box {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        .teacher-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        
+        .teacher-item:hover {
+            background-color: #f5f8fa;
+        }
+        
+        .teacher-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        
+        .absence-type {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        select {
+            padding: 8px;
+            border-radius: var(--border-radius);
+            border: 1px solid #ddd;
+            background-color: white;
+        }
+        
+        .period-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .period-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .period-btn.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .summary-section {
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: white;
+            background-color: var(--primary-color);
+        }
+        
+        .badge-success {
+            background-color: var(--success-color);
+        }
+        
+        .badge-warning {
+            background-color: var(--warning-color);
+        }
+        
+        .badge-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .input-group {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .input-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            font-size: 16px;
+        }
+        
+        .input-group button {
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        
+        .hours-input {
+            width: 70px;
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 0;
+            font-size: 16px;
+        }
+        
+        .credit-list {
+            margin-top: 10px;
+        }
+        
+        .credit-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .credit-name {
+            font-weight: 500;
+        }
+        
+        .credit-hours {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .hours-control {
+            display: flex;
+            align-items: center;
+        }
+        
+        .hours-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 0;
+        }
+        
+        .summary-list {
+            list-style: none;
+        }
+        
+        .summary-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .summary-name {
+            font-weight: bold;
+        }
+        
+        .summary-periods {
+            color: #777;
+            font-size: 0.9em;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        #period-summary {
+            display: none;
+        }
+        
+        @media print {
+            .no-print {
+                display: none;
+            }
+            
+            body {
+                background-color: white;
+                padding: 0;
+            }
+            
+            .panel {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Crea Sostituzioni</h1>
+            <p>Seleziona i professori che sono assenti e specifica se saranno assenti tutti il giorno o solo per qualche ora</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Lista Professori</h2>
+                    <div>
+                        <button id="add-teacher-btn" class="btn btn-primary">Aggiungi professore</button>
+                    </div>
+                </div>
+                
+                <input type="text" id="search-teacher" class="search-box" placeholder="Search teachers...">
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="all-teachers">Tutti i professori</div>
+                    <div class="tab" data-tab="absent-teachers">Professori assenti <span class="badge" id="absent-count">0</span></div>
+                </div>
+                
+                <div class="tab-content active" id="all-teachers-content">
+                    <div class="teacher-list" id="teacher-list">
+                        <!-- Teacher list will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="absent-teachers-content">
+                    <div class="teacher-list" id="absent-teacher-list">
+                        <!-- Absent teachers will be shown here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Riassunto</h2>
+                </div>
+                
+                <div class="summary-section">
+                    <h3>Professori che devono recuperare</h3>
+                    <div class="input-group">
+                        <input style="display: none;" type="text" id="credit-teacher-name" placeholder="Aggiungi professore che deve recuperare...">
+                        <select name="credit-teacher" id="credit-teacher">
+                            <!-- All teachers will be shown here as options -->
+                        </select>
+                        <input type="number" id="credit-hours" class="hours-input" min="1" value="1" title="Number of hours">
+                        <button id="add-credit-btn" class="btn btn-primary">Aggiungi</button>
+                    </div>
+                    <div class="credit-list" id="credit-list">
+                        <!-- Teachers with credit will be shown here -->
+                    </div>
+                </div>
+
+                <div class="summary-section">
+                    <div class="summary-list" id="period-summary">
+                        <!-- Period summary will be shown here -->
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="print-btn" class="btn btn-primary" style="display: none;">Stampa Riassunto</button>
+                    <button id="save-btn" class="btn btn-success">Salva</button>
+                    <button id="clear-btn" class="btn btn-danger">Svuota tutto</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for adding teacher -->
+    <div id="add-teacher-modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); overflow: auto;">
+        <div style="background-color: white; margin: 15% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 500px;">
+            <h2 style="margin-bottom: 15px;">Add New Teacher</h2>
+            <input type="text" id="new-teacher-name" placeholder="Teacher Name" style="width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ddd;">
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button id="cancel-add-teacher" class="btn btn-danger">Cancel</button>
+                <button id="confirm-add-teacher" class="btn btn-success">Add Teacher</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    
+    <script>
+        // Sample data - this would normally be loaded from a database
+        let teachers = JSON.parse(localStorage.getItem('teachers')) || [
+            { "id": 1, "name": "ARENA SALVATORE" },
+            { "id": 2, "name": "BAIOCCHI FRANCESCA" },
+            { "id": 3, "name": "BARBATO ALESSANDRA" },
+            { "id": 4, "name": "BATELLI ANTONIO" },
+            { "id": 5, "name": "BERTONI ELISABETTA" },
+            { "id": 6, "name": "BONUCCI BARBARA" },
+            { "id": 7, "name": "CIRILLO NATALIA" },
+            { "id": 8, "name": "CALEPRICO LEONARDO" },
+            { "id": 9, "name": "CASTELLINI CRISTINA" },
+            { "id": 10, "name": "CASTELLINI FRANCESCA" },
+            { "id": 11, "name": "CATENI VICTORIA" },
+            { "id": 12, "name": "CEFARIELLO CATERINA" },
+            { "id": 13, "name": "CHERUBINI LAURA" },
+            { "id": 14, "name": "CIACCI ANGELA" },
+            { "id": 15, "name": "CINCINNATO MARIA GRAZIA" },
+            { "id": 16, "name": "CIPRO ANNA" },
+            { "id": 17, "name": "COMBS LAURA ANNA" },
+            { "id": 18, "name": "CORSERI ELENA" },
+            { "id": 19, "name": "COVINO AMALIA" },
+            { "id": 20, "name": "D'ETTORE ANITA" },
+            { "id": 21, "name": "DA POZZO PAOLA" },
+            { "id": 22, "name": "DI BATTISTA  VALENTINA" },
+            { "id": 23, "name": "DI DOMENICO ANGELO" },
+            { "id": 24, "name": "DI GIOIA ANNA GRAZIA" },
+            { "id": 25, "name": "DI RISIO IVANA" },
+            { "id": 26, "name": "FINESCHI SILVIA" },
+            { "id": 27, "name": "FONZI MARIA CHIARA" },
+            { "id": 28, "name": "FRANCI TOMMASO" },
+            { "id": 29, "name": "FRUSCIANTE PASQUALINA" },
+            { "id": 30, "name": "GAGGI MONICA" },
+            { "id": 31, "name": "GAMBETTI ALESSANDRO" },
+            { "id": 32, "name": "GENTILE DANIELA" },
+            { "id": 33, "name": "GIORDANI DANIELA" },
+            { "id": 34, "name": "GUERRINI CLAUDIA" },
+            { "id": 35, "name": "GUIDI MONICA" },
+            { "id": 36, "name": "IMBERGAMO MASSIMO" },
+            { "id": 37, "name": "IORIO DOMENICO" },
+            { "id": 38, "name": "LAGHI PIER GIORGIO" },
+            { "id": 39, "name": "LOMBARDI ENNIO" },
+            { "id": 40, "name": "MACHETTI  ALESSANDRA" },
+            { "id": 41, "name": "MANGO ASSUNTA" },
+            { "id": 42, "name": "MASI SILVIA" },
+            { "id": 43, "name": "MATTERA SIMONE" },
+            { "id": 44, "name": "MAZZETTI ANNALISA" },
+            { "id": 45, "name": "MENTUCCIA DAVID" },
+            { "id": 46, "name": "MESSINA MANUELA" },
+            { "id": 47, "name": "MINDT NINA" },
+            { "id": 48, "name": "MORELLI LORENZO" },
+            { "id": 49, "name": "MUTARELLI VINCENZO" },
+            { "id": 50, "name": "NANNETTI GIULIANO" },
+            { "id": 51, "name": "NERI FEDERICA" },
+            { "id": 52, "name": "PAGNI ELENA" },
+            { "id": 53, "name": "PARIGI FRANCESCO" },
+            { "id": 54, "name": "PASQUI VALERIA" },
+            { "id": 55, "name": "PELI PIETRO" },
+            { "id": 56, "name": "PERRETTI ELENA" },
+            { "id": 57, "name": "SCANNAPIECO MARIA" },
+            { "id": 58, "name": "RIENZO MIRANDA" },
+            { "id": 59, "name": "TADDEI SONIA" },
+            { "id": 60, "name": "SANTORELLI MARIA" },
+            { "id": 61, "name": "SANTORIELLO ANGELA" },
+            { "id": 62, "name": "SCALI STEFANIA" },
+            { "id": 63, "name": "SCARPINI PATRIZIA" },
+            { "id": 64, "name": "SELIS PATRIZIA" },
+            { "id": 65, "name": "SGUERRI ANDREA" },
+            { "id": 66, "name": "SILVESTRI SILVIA" },
+            { "id": 67, "name": "TACCHI GIUSEPPINA" },
+            { "id": 68, "name": "TESTA FRANCESCA" },
+            { "id": 69, "name": "TOGNACCINI DONATELLA" },
+            { "id": 70, "name": "TOPPINI DONATELLA" },
+            { "id": 71, "name": "TOZZI EMMI" },
+            { "id": 72, "name": "ULIVIERI VALERIA" },
+            { "id": 73, "name": "VALENTE BERNARDA" },
+            { "id": 74, "name": "VALENTINI SERGIO" },
+            { "id": 75, "name": "VANNINI ANGELO" },
+            { "id": 76, "name": "VANNINI ANITA" },
+            { "id": 77, "name": "VANNONI BEATRICE" },
+            { "id": 78, "name": "VANNOZZI ALESSANDRA" },
+            { "id": 79, "name": "VECCHI DAFNE" },
+            { "id": 80, "name": "VITI VALERIA" }
+        ];
+        
+        let absences = JSON.parse(localStorage.getItem('absences')) || [];
+        let creditsTeachers = JSON.parse(localStorage.getItem('creditsTeachers')) || [];
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTeacherList();
+            renderAbsentTeachers();
+            renderCreditsTeachers();
+            renderCreditsList();
+            updateSummary();
+            updateAbsentCount();
+            
+            // Set up event listeners
+            document.getElementById('search-teacher').addEventListener('input', filterTeachers);
+            
+            // Tab functionality
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    const contentId = tab.getAttribute('data-tab') + '-content';
+                    document.getElementById(contentId).classList.add('active');
+                });
+            });
+            
+            // Button event listeners
+            document.getElementById('print-btn').addEventListener('click', printSummary);
+            document.getElementById('save-btn').addEventListener('click', saveData);
+            document.getElementById('clear-btn').addEventListener('click', clearAll);
+            document.getElementById('add-teacher-btn').addEventListener('click', showAddTeacherModal);
+            document.getElementById('cancel-add-teacher').addEventListener('click', hideAddTeacherModal);
+            document.getElementById('confirm-add-teacher').addEventListener('click', addNewTeacher);
+            document.getElementById('add-credit-btn').addEventListener('click', addCreditTeacher);
+            
+            // Ensure hours input has valid value
+            document.getElementById('credit-hours').addEventListener('input', function() {
+                if (this.value < 1) this.value = 1;
+            });
+        });
+        
+        // Render the list of all teachers
+        function renderTeacherList() {
+            const teacherList = document.getElementById('teacher-list');
+            teacherList.innerHTML = '';
+            
+            teachers.sort((a, b) => a.name.localeCompare(b.name)).forEach(teacher => {
+                const teacherItem = document.createElement('div');
+                teacherItem.className = 'teacher-item';
+                
+                // Check if teacher is marked as absent
+                const absence = absences.find(a => a.teacherId === teacher.id);
+                const isAbsent = absence !== undefined;
+                
+                teacherItem.innerHTML = `
+                    <div class="teacher-name">${teacher.name}</div>
+                    <div class="absence-type">
+                        <select class="absence-select" data-teacher-id="${teacher.id}">
+                            <option value="present" ${!isAbsent ? 'selected' : ''}>Presente</option>
+                            <option value="full-day" ${isAbsent && absence.type === 'full-day' ? 'selected' : ''}>Giorno Intero</option>
+                            <option value="specific-periods" ${isAbsent && absence.type === 'specific-periods' ? 'selected' : ''}>Ore Specifiche</option>
+                        </select>
+                    </div>
+                `;
+                
+                teacherList.appendChild(teacherItem);
+                
+                // Add period selector if needed
+                if (isAbsent && absence.type === 'specific-periods') {
+                    const periodSelector = createPeriodSelector(teacher.id, absence.periods);
+                    teacherItem.appendChild(periodSelector);
+                }
+                
+                // Add event listener to the select
+                const select = teacherItem.querySelector('.absence-select');
+                select.addEventListener('change', function() {
+                    handleAbsenceChange(teacher.id, this.value);
+                });
+            });
+        }
+        
+        // Create period selector for a teacher
+        function createPeriodSelector(teacherId, selectedPeriods = []) {
+            const container = document.createElement('div');
+            container.className = 'period-selector';
+            container.style.display = 'flex';
+            
+            for (let i = 1; i <= 8; i++) {
+                const btn = document.createElement('button');
+                btn.className = `period-btn ${selectedPeriods.includes(i) ? 'selected' : ''}`;
+                btn.textContent = i;
+                btn.setAttribute('data-period', i);
+                btn.setAttribute('data-teacher-id', teacherId);
+                
+                btn.addEventListener('click', function() {
+                    togglePeriod(this);
+                });
+                
+                container.appendChild(btn);
+            }
+            
+            return container;
+        }
+        
+        // Handle absence change
+        function handleAbsenceChange(teacherId, value) {
+            const existingAbsenceIndex = absences.findIndex(a => a.teacherId === teacherId);
+            
+            if (value === 'present') {
+                // Remove from absences if present
+                if (existingAbsenceIndex !== -1) {
+                    absences.splice(existingAbsenceIndex, 1);
+                }
+            } else {
+                // Add or update absence
+                const absence = {
+                    teacherId: teacherId,
+                    type: value,
+                    periods: value === 'full-day' ? [1, 2, 3, 4, 5, 6, 7, 8] : []
+                };
+                
+                if (existingAbsenceIndex !== -1) {
+                    absences[existingAbsenceIndex] = absence;
+                } else {
+                    absences.push(absence);
+                }
+            }
+            
+            // Re-render the teacher list and update summary
+            renderTeacherList();
+            renderAbsentTeachers();
+            updateSummary();
+            updateAbsentCount();
+        }
+        
+        // Toggle a period for a teacher
+        function togglePeriod(button) {
+            const period = parseInt(button.getAttribute('data-period'));
+            const teacherId = parseInt(button.getAttribute('data-teacher-id'));
+            const teacherAbsence = absences.find(a => a.teacherId === teacherId);
+            
+            if (teacherAbsence) {
+                if (button.classList.contains('selected')) {
+                    // Remove period
+                    teacherAbsence.periods = teacherAbsence.periods.filter(p => p !== period);
+                    button.classList.remove('selected');
+                } else {
+                    // Add period
+                    teacherAbsence.periods.push(period);
+                    teacherAbsence.periods.sort((a, b) => a - b);
+                    button.classList.add('selected');
+                }
+                
+                // If no periods are selected, set teacher as present
+                if (teacherAbsence.periods.length === 0) {
+                    const selectElement = document.querySelector(`.absence-select[data-teacher-id="${teacherId}"]`);
+                    if (selectElement) {
+                        selectElement.value = 'present';
+                    }
+                    handleAbsenceChange(teacherId, 'present');
+                }
+            }
+            
+            renderAbsentTeachers();
+            updateSummary();
+        }
+        
+        // Render absent teachers
+        function renderAbsentTeachers() {
+            const absentList = document.getElementById('absent-teacher-list');
+            absentList.innerHTML = '';
+            
+            if (absences.length === 0) {
+                absentList.innerHTML = '<div class="teacher-item">No absent teachers</div>';
+                return;
+            }
+            
+            absences.forEach(absence => {
+                const teacher = teachers.find(t => t.id === absence.teacherId);
+                if (!teacher) return;
+                
+                const item = document.createElement('div');
+                item.className = 'teacher-item';
+                
+                item.innerHTML = `
+                    <div class="teacher-name">${teacher.name}</div>
+                    <div class="absence-type">
+                        <span class="badge ${absence.type === 'full-day' ? 'badge-danger' : 'badge-warning'}">
+                            ${absence.type === 'full-day' ? 'Giorno Intero' : `Ore: ${absence.periods.join(', ')}`}
+                        </span>
+                    </div>
+                `;
+                
+                absentList.appendChild(item);
+            });
+        }
+        
+        // Add teacher who owes coverage hours
+        function addCreditTeacher() {
+            const nameInput = document.getElementById('credit-teacher');
+            const hoursInput = document.getElementById('credit-hours');
+            const name = nameInput.value.trim();
+            const hours = parseInt(hoursInput.value) || 1;
+            
+            if (!name) return;
+            if (hours < 1) {
+                hoursInput.value = 1;
+                return;
+            }
+            
+            // Check if teacher already exists in credits list
+            const existingTeacher = creditsTeachers.find(t => t.name.toLowerCase() === name.toLowerCase());
+            
+            if (existingTeacher) {
+                existingTeacher.hours += hours;
+            } else {
+                creditsTeachers.push({
+                    id: Date.now(),
+                    name: name,
+                    hours: hours
+                });
+            }
+            
+            nameInput.value = '';
+            hoursInput.value = 1;
+            renderCreditsTeachers();
+            updateSummary();
+        }
+
+        function renderCreditsList() {
+            const creditSelect = document.getElementById('credit-teacher');
+            creditSelect.innerHTML = '';
+            teachers.forEach(teacher => {
+                const option = document.createElement('option');
+                option.value = teacher.name;
+                option.textContent = teacher.name;
+                creditSelect.appendChild(option);
+            });
+        }
+        
+        // Render teachers who owe coverage hours
+        function renderCreditsTeachers() {
+            const creditList = document.getElementById('credit-list');
+            creditList.innerHTML = '';
+            
+            if (creditsTeachers.length === 0) {
+                creditList.innerHTML = '<div class="credit-item">Nessun professore deve recuperare ore</div>';
+                return;
+            }
+            
+            creditsTeachers.sort((a, b) => b.hours - a.hours).forEach(teacher => {
+                const item = document.createElement('div');
+                item.className = 'credit-item';
+                
+                item.innerHTML = `
+                    <div class="credit-name">${teacher.name}</div>
+                    <div class="credit-hours">
+                        <span>${teacher.hours} hour${teacher.hours !== 1 ? 's' : ''}</span>
+                        <div class="hours-control">
+                            <button class="btn btn-danger hours-btn" onclick="modifyCredit(${teacher.id}, -1)">-</button>
+                            <button class="btn btn-success hours-btn" onclick="modifyCredit(${teacher.id}, 1)">+</button>
+                        </div>
+                    </div>
+                `;
+                
+                creditList.appendChild(item);
+            });
+        }
+        
+        // Modify credit hours for a teacher
+        window.modifyCredit = function(id, delta) {
+            const teacherIndex = creditsTeachers.findIndex(t => t.id === id);
+            
+            if (teacherIndex !== -1) {
+                creditsTeachers[teacherIndex].hours += delta;
+                
+                if (creditsTeachers[teacherIndex].hours <= 0) {
+                    creditsTeachers.splice(teacherIndex, 1);
+                }
+                
+                renderCreditsTeachers();
+                updateSummary();
+            }
+        };
+        
+        // Update period coverage summary
+        function updateSummary() {
+            const summaryContainer = document.getElementById('period-summary');
+            summaryContainer.innerHTML = '';
+            
+            // Calculate coverage needs per period
+            const periodNeeds = {};
+            for (let i = 1; i <= 8; i++) {
+                periodNeeds[i] = {
+                    count: 0,
+                    teachers: []
+                };
+            }
+            
+            absences.forEach(absence => {
+                const teacher = teachers.find(t => t.id === absence.teacherId);
+                if (!teacher) return;
+                
+                absence.periods.forEach(period => {
+                    periodNeeds[period].count++;
+                    periodNeeds[period].teachers.push(teacher.name);
+                });
+            });
+            
+            // Create the summary items
+            for (let i = 1; i <= 8; i++) {
+                if (periodNeeds[i].count === 0) continue;
+                
+                const item = document.createElement('div');
+                item.className = 'summary-item';
+                
+                const recommendedCoverage = creditsTeachers
+                    .sort((a, b) => b.hours - a.hours)
+                    .slice(0, periodNeeds[i].count)
+                    .map(t => t.name)
+                    .join(', ');
+                
+                item.innerHTML = `
+                    <div class="summary-name">Period ${i}: ${periodNeeds[i].count} teacher${periodNeeds[i].count !== 1 ? 's' : ''} needed</div>
+                    <div class="summary-periods">Absent: ${periodNeeds[i].teachers.join(', ')}</div>
+                    <div class="summary-periods">Suggested coverage: ${recommendedCoverage || 'No recommendations available'}</div>
+                `;
+                
+                summaryContainer.appendChild(item);
+            }
+            
+            if (Object.values(periodNeeds).every(p => p.count === 0)) {
+                summaryContainer.innerHTML = '<div class="summary-item">No coverage needed</div>';
+            }
+        }
+        
+        // Update absent teacher count
+        function updateAbsentCount() {
+            document.getElementById('absent-count').textContent = absences.length;
+        }
+        
+        // Filter teachers by name
+        function filterTeachers() {
+            const searchTerm = document.getElementById('search-teacher').value.toLowerCase();
+            const teacherItems = document.querySelectorAll('#teacher-list .teacher-item');
+            
+            teacherItems.forEach(item => {
+                const teacherName = item.querySelector('.teacher-name').textContent.toLowerCase();
+                item.style.display = teacherName.includes(searchTerm) ? 'flex' : 'none';
+            });
+        }
+        
+        // Print summary
+        function printSummary() {
+            window.print();
+        }
+        
+        // Save data to localStorage
+        function saveData() {
+            let absent_full_day = [];
+            let absent_some_periods = [];
+            let credit_list = [];
+            
+            absences.forEach(absence => {
+                if (absence.type === 'full-day') {
+                    absent_full_day.push(absence.teacherId);
+                } else {
+                    absent_some_periods.push({
+                        teacherId: absence.teacherId,
+                        periods: absence.periods
+                    });
+                }
+            });
+            
+            const creditItems = document.querySelectorAll('.credit-item');
+            creditItems.forEach(item => {
+                const teacherId = item.getAttribute('data-teacher-id');
+                const hours = item.querySelector('.hours-input').value;
+                credit_list.push({teacherId, hours});
+            });
+
+            $.ajax({
+                url: '/api/get_sostituzioni',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    absent_full_day: absent_full_day,
+                    absent_some_periods: absent_some_periods,
+                    credit_list: credit_list
+                }),
+                success: function(response) {
+                    console.log('Success:', response);
+                    // Handle successful response
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                    // Handle error response
+                }
+            });
+
+        }   
+        
+        // Clear all data
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                absences = [];
+                renderTeacherList();
+                renderAbsentTeachers();
+                updateSummary();
+                updateAbsentCount();
+            }
+        }
+        
+        // Show the add teacher modal
+        function showAddTeacherModal() {
+            document.getElementById('add-teacher-modal').style.display = 'block';
+            document.getElementById('new-teacher-name').focus();
+        }
+        
+        // Hide the add teacher modal
+        function hideAddTeacherModal() {
+            document.getElementById('add-teacher-modal').style.display = 'none';
+        }
+        
+        // Add a new teacher
+        function addNewTeacher() {
+            const nameInput = document.getElementById('new-teacher-name');
+            const name = nameInput.value.trim();
+            
+            if (name) {
+                const newId = teachers.length > 0 ? Math.max(...teachers.map(t => t.id)) + 1 : 1;
+                teachers.push({
+                    id: newId,
+                    name: name
+                });
+                
+                renderTeacherList();
+                nameInput.value = '';
+                hideAddTeacherModal();
+            }
+        }
+    </script>
+</body>
+</html>
