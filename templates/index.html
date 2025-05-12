@@ -714,9 +714,11 @@
         function addCreditTeacher() {
             const nameInput = document.getElementById('credit-teacher');
             const hoursInput = document.getElementById('credit-hours');
+            console.log(hoursInput)
             const name = nameInput.value.trim();
             const hours = parseInt(hoursInput.value) || 1;
-            
+            const teacher_id = nameInput.options[nameInput.selectedIndex].getAttribute('data-teacher-id');
+
             if (!name) return;
             if (hours < 1) {
                 hoursInput.value = 1;
@@ -730,7 +732,7 @@
                 existingTeacher.hours += hours;
             } else {
                 creditsTeachers.push({
-                    id: Date.now(),
+                    teacher_id: teacher_id,
                     name: name,
                     hours: hours
                 });
@@ -749,6 +751,8 @@
                 const option = document.createElement('option');
                 option.value = teacher.name;
                 option.textContent = teacher.name;
+                option.setAttribute('data-teacher-id', teacher.id);
+                
                 creditSelect.appendChild(option);
             });
         }
@@ -763,12 +767,14 @@
                 return;
             }
             
-            creditsTeachers.sort((a, b) => b.hours - a.hours).forEach(teacher => {
+            creditsTeachers.sort((a, b) => a.name.localeCompare(b.name)).forEach(teacher => {
                 const item = document.createElement('div');
                 item.className = 'credit-item';
                 
                 item.innerHTML = `
                     <div class="credit-name">${teacher.name}</div>
+                    <span class="credit-id" style="display: none">${teacher.teacher_id}</span>
+                    <span class="credit-amount" style="display: none">${teacher.hours}</span>
                     <div class="credit-hours">
                         <span>${teacher.hours} hour${teacher.hours !== 1 ? 's' : ''}</span>
                         <div class="hours-control">
@@ -888,10 +894,15 @@
             });
             
             const creditItems = document.querySelectorAll('.credit-item');
+            console.log(creditItems)
             creditItems.forEach(item => {
-                const teacherId = item.getAttribute('data-teacher-id');
-                const hours = item.querySelector('.hours-input').value;
-                credit_list.push({teacherId, hours});
+                const teacherId = item.querySelector('.credit-id').innerHTML;
+                const hoursInput = item.querySelector('.credit-amount').innerHTML;
+                console.log("teacherId")
+                console.log(teacherId)
+                console.log("hours")
+                console.log(hoursInput)
+                credit_list.push({"teacherId": teacherId, "hours": hoursInput});
             });
 
             $.ajax({
