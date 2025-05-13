@@ -1,0 +1,9 @@
+{
+  "late_enter": { "2F": 1 },
+  "early_exit": {},
+  "substitutes": {
+    "1S": { "3": "CEFARIELLO CATERINA" },
+    "4L": { "1": "GENTILE DANIELA" },
+    "4S": { "2": "GAMBETTI ALESSANDRO" }
+  }
+}
