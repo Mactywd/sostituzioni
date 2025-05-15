@@ -1,9 +1,16 @@
 {
-  "late_enter": { "2F": 1 },
-  "early_exit": {},
+  "late_enter": { "3C": 2, "3S": 1, "4B": 1, "5F": 1, "5O": 1 },
+  "early_exit": { "2B": 1, "2F": 2, "3E": 2, "3F": 2, "4L": 1, "5S": 1 },
   "substitutes": {
-    "1S": { "3": "CEFARIELLO CATERINA" },
-    "4L": { "1": "GENTILE DANIELA" },
-    "4S": { "2": "GAMBETTI ALESSANDRO" }
+    "1B": { "1": "PARIGI FRANCESCO (G)", "2": "IMBERGAMO MASSIMO (R)" },
+    "1O": { "2": "VALENTINI SERGIO (G)" },
+    "2D": { "3": "CINCINNATO MARIA GRAZIA (G)" },
+    "2F": { "2": "CIRILLO NATALIA (G)" },
+    "3B": { "4": "IMBERGAMO MASSIMO (G)" },
+    "3I": { "1": "MACHETTI  ALESSANDRA (G)" },
+    "3O": { "2": "SCANNAPIECO MARIA (D)", "3": "FRANCI TOMMASO (G)" },
+    "4E": { "2": "PASQUI VALERIA (D)" },
+    "5I": { "1": "CASTELLINI CRISTINA (G)", "3": "IMBERGAMO MASSIMO (G)" },
+    "5O": { "2": "TADDEI SONIA (P)" }
   }
 }
