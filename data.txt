@@ -1,0 +1,4 @@
+Absent full day: [3]
+Absent some periods: [{'teacherId': 8, 'periods': [3, 4]}]
+Credit list: [{'teacherId': '16', 'hours': '2'}]
+Class trips: [{'classId': 8, 'tripType': 'partial-class'}, {'classId': 20, 'tripType': 'full-class'}]

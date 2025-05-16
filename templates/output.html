@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizza Risultato</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --border-radius: 6px;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        /* Container for content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Header styling to match original */
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .header p {
+            font-size: 16px;
+        }
+        
+        /* Output box */
+        .output-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .output-container h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+            font-weight: 500;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--light-color);
+        }
+        
+        .output-textarea {
+            width: 100%;
+            min-height: 300px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            padding: 12px;
+            font-family: monospace;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        
+        /* Buttons to match original styling */
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        /* Notification */
+        .notification {
+            padding: 10px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .notification-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+        <div class="header">
+            <div class="container">
+                <h1>Visualizza Risultato</h1>
+                <p>Qui puoi visualizzare, modificare e copiare il risultato</p>
+            </div>
+        </div>
+        <div class="notification" id="copyNotification">
+            Testo copiato negli appunti!
+        </div>
+        
+        <div class="output-container">
+            <h2>Output</h2>
+            <textarea class="output-textarea" id="outputText" placeholder="Caricamento in corso..."></textarea>
+            
+            <div class="buttons-container">
+                <button class="btn btn-success" id="copyBtn">Copia</button>
+                <button class="btn btn-primary" id="refreshBtn">Aggiorna</button>
+                <a href="index.html" class="btn btn-danger">Indietro</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to load the output from the server
+            function loadOutput() {
+                // Simulate fetch request to backend
+                // In a real implementation, replace this with your actual API endpoint
+                fetch('api/getOutput')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Errore nel caricamento dei dati');
+                        }
+                        return response.text();
+                    })
+                    .then(data => {
+                        document.getElementById('outputText').value = data;
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // For demo purposes, populate with sample multi-line text
+                        document.getElementById('outputText').value = 
+                            'ARENA SALVATORE - Sostituito da MORETTI LUCIA - 1B (Italiano)\n' +
+                            'BARBATO ALESSANDRA - Sostituito da RICCI MARCO - 3A (Matematica)\n' +
+                            'CALEPRICO LEONARDO - Sostituito da ESPOSITO ANNA - 2C (Storia)\n' +
+                            'CASTELLINI CRISTINA - Sostituito da ROSSI GIUSEPPE - 4B (Fisica)\n\n' +
+                            'Totale sostituzioni: 4\n' +
+                            'Data: 16/05/2025';
+                    });
+            }
+            
+            // Load the output when the page loads
+            loadOutput();
+            
+            // Copy button functionality
+            document.getElementById('copyBtn').addEventListener('click', function() {
+                const outputText = document.getElementById('outputText');
+                outputText.select();
+                document.execCommand('copy');
+                
+                // Show notification
+                const notification = document.getElementById('copyNotification');
+                notification.className = 'notification notification-success';
+                notification.style.display = 'block';
+                
+                // Hide notification after 2 seconds
+                setTimeout(function() {
+                    notification.style.display = 'none';
+                }, 2000);
+            });
+            
+            // Refresh button functionality
+            document.getElementById('refreshBtn').addEventListener('click', loadOutput);
+        });
+    </script>
+</body>
+</html>

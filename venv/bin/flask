@@ -1,4 +1,4 @@
-#!/home/mattia/Desktop/coding/js/sostituzioni/venv/bin/python
+#!/home/mattia/Desktop/coding/projects/sostituzioni/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

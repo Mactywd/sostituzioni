@@ -236,7 +236,8 @@
             margin-top: 10px;
         }
         
-        .credit-item {
+        .credit-item,
+        .trip-item {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
@@ -324,6 +325,27 @@
         #period-summary {
             display: none;
         }
+
+        .class-trip-list {
+            margin-top: 10px;
+        }
+
+        .class-trip-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .class-name {
+            font-weight: 500;
+        }
+
+        .trip-type {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
         
         @media print {
             .no-print {
@@ -354,7 +376,7 @@
                 <div class="panel-header">
                     <h2>Lista Professori</h2>
                     <div>
-                        <button id="add-teacher-btn" class="btn btn-primary">Aggiungi professore</button>
+                        <button id="add-teacher-btn" style="display: none;" class="btn btn-primary">Aggiungi professore</button>
                     </div>
                 </div>
                 
@@ -384,6 +406,23 @@
                 </div>
                 
                 <div class="summary-section">
+                    <h3>Classi in Gita</h3>
+                    <div class="input-group">
+                        <select name="class-select" id="class-select">
+                            <!-- Classes will be dynamically loaded here -->
+                        </select>
+                        <select name="trip-type" id="trip-type">
+                            <option value="full-class">Classe Intera</option>
+                            <option value="partial-class">Classe Parziale</option>
+                        </select>
+                        <button id="add-class-trip-btn" class="btn btn-primary">Aggiungi</button>
+                    </div>
+                    <div class="class-trip-list" id="class-trip-list">
+                        <!-- Classes on trip will be shown here -->
+                    </div>
+                </div>
+
+                <div class="summary-section">
                     <h3>Professori che devono recuperare</h3>
                     <div class="input-group">
                         <input style="display: none;" type="text" id="credit-teacher-name" placeholder="Aggiungi professore che deve recuperare...">
@@ -402,6 +441,17 @@
                     <div class="summary-list" id="period-summary">
                         <!-- Period summary will be shown here -->
                     </div>
+                </div>
+
+                <div class="summary-section">
+                    <h3>Giorno della settimana</h3>
+                    <select id="weekday-select" class="search-box">
+                        <option value="1">Lunedì</option>
+                        <option value="2">Martedì</option>
+                        <option value="3">Mercoledì</option>
+                        <option value="4">Giovedì</option>
+                        <option value="5">Venerdì</option>
+                    </select>
                 </div>
                 
                 <div class="action-buttons">
@@ -425,8 +475,9 @@
         </div>
     </div>
     
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    
+    <!-- jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
     <script>
         // Sample data - this would normally be loaded from a database
         let teachers = JSON.parse(localStorage.getItem('teachers')) || [
@@ -515,6 +566,133 @@
         let absences = JSON.parse(localStorage.getItem('absences')) || [];
         let creditsTeachers = JSON.parse(localStorage.getItem('creditsTeachers')) || [];
         
+        // Sample class data - this would normally be loaded from a database
+        let classes = [
+            { "id": 1, "name": "1B" },
+            { "id": 2, "name": "1C" },
+            { "id": 3, "name": "1D" },
+            { "id": 4, "name": "1E" },
+            { "id": 5, "name": "1I" },
+            { "id": 6, "name": "1L" },
+            { "id": 7, "name": "1O" },
+            { "id": 8, "name": "1O/S" },
+            { "id": 9, "name": "1S" },
+            { "id": 10, "name": "2B" },
+            { "id": 11, "name": "2C" },
+            { "id": 12, "name": "2D" },
+            { "id": 13, "name": "2E" },
+            { "id": 14, "name": "2F" },
+            { "id": 15, "name": "2I" },
+            { "id": 16, "name": "2L" },
+            { "id": 17, "name": "2O" },
+            { "id": 18, "name": "2S" },
+            { "id": 19, "name": "3B" },
+            { "id": 20, "name": "3C" },
+            { "id": 21, "name": "3D" },
+            { "id": 22, "name": "3E" },
+            { "id": 23, "name": "3F" },
+            { "id": 24, "name": "3I" },
+            { "id": 25, "name": "3O" },
+            { "id": 26, "name": "3S" },
+            { "id": 27, "name": "4B" },
+            { "id": 28, "name": "4D" },
+            { "id": 29, "name": "4E" },
+            { "id": 30, "name": "4F" },
+            { "id": 31, "name": "4I" },
+            { "id": 32, "name": "4L" },
+            { "id": 33, "name": "4O" },
+            { "id": 34, "name": "4S" },
+            { "id": 35, "name": "5B" },
+            { "id": 36, "name": "5D" },
+            { "id": 37, "name": "5E" },
+            { "id": 38, "name": "5F" },
+            { "id": 39, "name": "5I" },
+            { "id": 40, "name": "5L" },
+            { "id": 41, "name": "5O" },
+            { "id": 42, "name": "5S" }
+            ];
+
+        let classTrips = JSON.parse(localStorage.getItem('classTrips')) || [];
+
+        // Add these functions to handle class trips
+
+        // Render class dropdown options
+        function renderClassOptions() {
+            const classSelect = document.getElementById('class-select');
+            classSelect.innerHTML = '';
+            
+            classes.forEach(classItem => {
+                const option = document.createElement('option');
+                option.value = classItem.id;
+                option.textContent = classItem.name;
+                classSelect.appendChild(option);
+            });
+        }
+
+        // Add a class trip
+        function addClassTrip() {
+            const classSelect = document.getElementById('class-select');
+            const tripTypeSelect = document.getElementById('trip-type');
+            
+            const classId = parseInt(classSelect.value);
+            const tripType = tripTypeSelect.value;
+            
+            // Check if class already exists in trips
+            const existingTripIndex = classTrips.findIndex(t => t.classId === classId);
+            
+            if (existingTripIndex !== -1) {
+                // Update existing trip
+                classTrips[existingTripIndex].tripType = tripType;
+            } else {
+                // Add new trip
+                const classItem = classes.find(c => c.id === classId);
+                if (classItem) {
+                    classTrips.push({
+                        classId: classId,
+                        className: classItem.name,
+                        tripType: tripType
+                    });
+                }
+            }
+            
+            renderClassTrips();
+        }
+
+        // Render class trips list
+        function renderClassTrips() {
+            const classTripList = document.getElementById('class-trip-list');
+            classTripList.innerHTML = '';
+            
+            if (classTrips.length === 0) {
+                classTripList.innerHTML = '<div class="trip-item">Nessuna classe in gita</div>';
+                return;
+            }
+            
+            classTrips.sort((a, b) => a.className.localeCompare(b.className)).forEach((trip, index) => {
+                const item = document.createElement('div');
+                item.className = 'trip-item';
+                
+                const tripTypeLabel = trip.tripType === 'full-class' ? 'Classe Intera' : 'Classe Parziale';
+                const badgeClass = trip.tripType === 'full-class' ? 'badge-danger' : 'badge-warning';
+                
+                item.innerHTML = `
+                    <div class="credit-name">${trip.className}</div>
+                    <div class="credit-hours">
+                        <span class="badge ${badgeClass}">${tripTypeLabel}</span>
+                        <button class="btn btn-danger hours-btn" onclick="removeClassTrip(${index})">×</button>
+                    </div>
+                `;
+                
+                classTripList.appendChild(item);
+            });
+        }
+
+        // Remove a class trip
+        window.removeClassTrip = function(index) {
+            classTrips.splice(index, 1);
+            renderClassTrips();
+        };
+
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
             renderTeacherList();
@@ -523,7 +701,9 @@
             renderCreditsList();
             updateSummary();
             updateAbsentCount();
-            
+            renderClassOptions();
+            renderClassTrips();
+
             // Set up event listeners
             document.getElementById('search-teacher').addEventListener('input', filterTeachers);
             
@@ -547,6 +727,7 @@
             document.getElementById('cancel-add-teacher').addEventListener('click', hideAddTeacherModal);
             document.getElementById('confirm-add-teacher').addEventListener('click', addNewTeacher);
             document.getElementById('add-credit-btn').addEventListener('click', addCreditTeacher);
+            document.getElementById('add-class-trip-btn').addEventListener('click', addClassTrip);
             
             // Ensure hours input has valid value
             document.getElementById('credit-hours').addEventListener('input', function() {
@@ -763,7 +944,7 @@
             creditList.innerHTML = '';
             
             if (creditsTeachers.length === 0) {
-                creditList.innerHTML = '<div class="credit-item">Nessun professore deve recuperare ore</div>';
+                creditList.innerHTML = '<div class="trip-item">Nessun professore deve recuperare ore</div>';
                 return;
             }
             
@@ -881,6 +1062,8 @@
             let absent_full_day = [];
             let absent_some_periods = [];
             let credit_list = [];
+            let class_trips = [];
+            const weekday = document.getElementById('weekday-select').value;
             
             absences.forEach(absence => {
                 if (absence.type === 'full-day') {
@@ -894,15 +1077,19 @@
             });
             
             const creditItems = document.querySelectorAll('.credit-item');
-            console.log(creditItems)
             creditItems.forEach(item => {
+                console.log("item")
+                console.log(item)
                 const teacherId = item.querySelector('.credit-id').innerHTML;
                 const hoursInput = item.querySelector('.credit-amount').innerHTML;
-                console.log("teacherId")
-                console.log(teacherId)
-                console.log("hours")
-                console.log(hoursInput)
                 credit_list.push({"teacherId": teacherId, "hours": hoursInput});
+            });
+
+            classTrips.forEach(trip => {
+                class_trips.push({
+                    classId: trip.classId,
+                    tripType: trip.tripType
+                });
             });
 
             $.ajax({
@@ -910,9 +1097,11 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
+                    weekday: weekday,
                     absent_full_day: absent_full_day,
                     absent_some_periods: absent_some_periods,
-                    credit_list: credit_list
+                    credit_list: credit_list,
+                    class_trips: class_trips
                 }),
                 success: function(response) {
                     console.log('Success:', response);
@@ -923,15 +1112,19 @@
                     // Handle error response
                 }
             });
-
         }   
         
         // Clear all data
         function clearAll() {
             if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
                 absences = [];
+                creditsTeachers = []; // Also clear credits
+                classTrips = []; // Clear class trips
+                
                 renderTeacherList();
                 renderAbsentTeachers();
+                renderCreditsTeachers();
+                renderClassTrips();
                 updateSummary();
                 updateAbsentCount();
             }
